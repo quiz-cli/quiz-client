@@ -4,7 +4,7 @@ import string
 import sys
 
 import aioconsole
-from websockets import WebSocketClientProtocol, connect
+from websockets import connect, ClientConnection
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
 
@@ -16,14 +16,14 @@ async def send_receive_messages(uri: str, client_id: str):
         )
 
 
-async def send_messages(ws: WebSocketClientProtocol, client_id: str):
+async def send_messages(ws: ClientConnection, client_id: str):
     while True:
         user_input = await aioconsole.ainput()
         if user_input:
             await ws.send(json.dumps({"client_id": client_id, "answer": user_input}))
 
 
-async def receive_messages(ws: WebSocketClientProtocol):
+async def receive_messages(ws: ClientConnection):
     while True:
         response = await ws.recv()
         message = json.loads(response)
