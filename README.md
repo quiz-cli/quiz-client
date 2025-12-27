@@ -4,9 +4,6 @@ This is the client side of the client-server quiz application. It tries to
 provide the quiz game experience similar to **Kahoot** but in much lighter and
 open manner as a CLI program.
 
-The server can be found at
-[quiz-server](https://github.com/ZelenyMartin/quiz-server).
-
 The client is a regular CLI application making connection to the server
 counterpart through the **WebSockets**. The client-server architecture is
 designed that the CLI client can be eventually replaced by a JavaScript web
