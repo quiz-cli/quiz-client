@@ -41,3 +41,7 @@ $ uv run ruff format
 ```bash
 $ uv run ruff check
 ```
+
+```bash
+$ uv run ty check
+```

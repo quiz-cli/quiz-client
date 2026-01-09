@@ -29,4 +29,4 @@ jobs:
           python-version: '3.13'
       - uses: astral-sh/setup-uv@v7
       - run: uv tool install ty
-      - run: ty check
+      - run: uv run ty check
