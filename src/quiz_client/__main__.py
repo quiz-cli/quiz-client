@@ -10,9 +10,9 @@ import json
 import sys
 
 import aioconsole
+from quiz_common.models import Question
 from websockets import ClientConnection, connect
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
-from quiz_common.models import Question
 
 
 async def send_receive_messages(uri: str, client_id: str) -> None:
@@ -42,8 +42,8 @@ async def receive_messages(ws: ClientConnection) -> None:
         match message.get("type"):
             case "question":
                 question = Question(
-                text=message.get("text"), options=message.get("options")
-            )
+                    text=message.get("text"), options=message.get("options")
+                )
                 question.print_question()
                 print("Answer:")
             case "repeat":
