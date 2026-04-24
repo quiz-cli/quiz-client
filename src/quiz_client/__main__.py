@@ -12,7 +12,7 @@ import sys
 import aioconsole
 from websockets import ClientConnection, connect
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
-from quiz_common.models import Question, Option
+from quiz_common.models import Question
 
 
 async def send_receive_messages(uri: str, client_id: str) -> None:
