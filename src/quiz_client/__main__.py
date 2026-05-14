@@ -44,6 +44,8 @@ async def receive_messages(ws: ClientConnection) -> None:
                 print_question(message)
             case "repeat":
                 print(f"You answered: {message['text']}")
+            case "final_results":
+                print(message["results"])
             case _:
                 print(message["text"])
 
