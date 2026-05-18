@@ -13,6 +13,7 @@ dependencies = [
     "asyncio>=3.4.3",
     "websockets>=10.0",
     "aioconsole>=0.6.2",
+    "quiz-common",
 ]
 
 [build-system]
@@ -33,6 +34,9 @@ ignore = [
     "COM812",
     "T201",
 ]
+
+[tool.uv.sources]
+quiz-common = { git = "https://github.com/quiz-cli/quiz-common.git" }
 
 [project.scripts]
 quiz-client = "quiz_client.__main__:main"

@@ -7,10 +7,10 @@ participate in the quiz session via a websocket connection.
 
 import asyncio
 import json
-import string
 import sys
 
 import aioconsole
+from quiz_common.models import Question
 from websockets import ClientConnection, connect
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
@@ -41,21 +41,17 @@ async def receive_messages(ws: ClientConnection) -> None:
 
         match message.get("type"):
             case "question":
-                print_question(message)
+                question = Question(
+                    text=message.get("text"), options=message.get("options")
+                )
+                question.print_question()
+                print("Answer:")
             case "repeat":
                 print(f"You answered: {message['text']}")
             case "final_results":
                 print(message["results"])
             case _:
                 print(message["text"])
-
-
-def print_question(question: dict[str, list]) -> None:
-    """Nicely print text of the question with possible answeres."""
-    print(f"Question: {question['text']}")
-    for letter, opt in zip(string.ascii_letters, question["options"], strict=False):
-        print(f"\t{letter}) {opt}")
-    print("Answer:")
 
 
 def main() -> None:
