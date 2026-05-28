@@ -13,7 +13,12 @@ dependencies = [
     "asyncio>=3.4.3",
     "websockets>=10.0",
     "aioconsole>=0.6.2",
+     "fastapi[standard]>=0.112.1",
+    "quiz-common",
+    "pydantic>=2.12.5",
 ]
+[tool.uv.sources]
+quiz-common = { path = "../quiz-common" }
 
 [build-system]
 requires = ["hatchling"]

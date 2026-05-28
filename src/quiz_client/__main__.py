@@ -14,6 +14,12 @@ import aioconsole
 from websockets import ClientConnection, connect
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
+from pydantic import TypeAdapter
+from quiz_common.models import Message, TextMessage, QuestionMessage, Question, AnswerMessage
+
+
+
+
 
 async def send_receive_messages(uri: str, client_id: str) -> None:
     """
@@ -30,29 +36,27 @@ async def send_messages(ws: ClientConnection, client_id: str) -> None:
     while True:
         user_input = await aioconsole.ainput()
         if user_input:
-            await ws.send(json.dumps({"client_id": client_id, "answer": user_input}))
+            await ws.send(AnswerMessage(client_id=client_id, answer=user_input).model_dump_json())
 
-
+    
 async def receive_messages(ws: ClientConnection) -> None:
     """Receive messages from the server and print them to the console."""
     while True:
         response = await ws.recv()
-        message = json.loads(response)
+        message = TypeAdapter(Message).validate_json(response)
 
-        match message.get("type"):
-            case "question":
-                print_question(message)
-            case "repeat":
-                print(f"You answered: {message['text']}")
-            case _:
-                print(message["text"])
+        match message.type:
+            case "quiz_question":
+                print_question(message.question)
+            case "text":
+                print(message.text.format(**message.params or {}))
 
 
-def print_question(question: dict[str, list]) -> None:
+def print_question(question: Question) -> None:
     """Nicely print text of the question with possible answeres."""
-    print(f"Question: {question['text']}")
-    for letter, opt in zip(string.ascii_letters, question["options"], strict=False):
-        print(f"\t{letter}) {opt}")
+    print(f"Question: {question.text}")
+    for letter, opt in zip(string.ascii_letters, question.options, strict=False):
+        print(f"\t{letter}) {opt.answer}")
     print("Answer:")
 
 
