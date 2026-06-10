@@ -29,6 +29,7 @@ async def send_messages(ws: ClientConnection, client_id: str) -> None:
     """Prompt the user for input and send messages to the server over the websocket."""
     while True:
         user_input = await aioconsole.ainput()
+        user_input = sanitization(user_input)
         if user_input:
             await ws.send(json.dumps({"client_id": client_id, "answer": user_input}))
 
@@ -65,6 +66,17 @@ def print_question(question: dict[str, list]) -> None:
         print(f"\t{letter}) {opt}")
     print("Answer:")
 
+def sanitization(user_input: str) -> list[bool]:
+    """Provide list of bools instead of letters."""
+    user_input = user_input.replace(" ", "")
+    if user_input.isalpha():
+        position_of_max_letter = ord(max(user_input.upper())) - ord("A") + 1
+        answer = [False] * position_of_max_letter
+        for letter in user_input.upper():
+            position_in_alphabet = ord(letter) - ord("A")
+            answer[position_in_alphabet] = True
+        return answer
+    return []
 
 def main() -> None:
     """
