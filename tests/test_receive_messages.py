@@ -3,10 +3,14 @@
 import asyncio
 import json
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
 from quiz_client.__main__ import receive_messages
+
+if TYPE_CHECKING:
+    from websockets.asyncio.client import ClientConnection
 
 
 class StopReceivingError(Exception):
@@ -54,6 +58,6 @@ def test_receive_messages_prints_question_result(
     websocket = FakeWebSocket(json.dumps(message))
 
     with pytest.raises(StopReceivingError):
-        asyncio.run(receive_messages(websocket))
+        asyncio.run(receive_messages(cast("ClientConnection", websocket)))
 
     assert capsys.readouterr().out == expected_output
