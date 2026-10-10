@@ -53,6 +53,7 @@ async def receive_messages(ws: ClientConnection) -> None:
                 else:
                     print("You did not answer.")
             case "final_results":
+                print(f"Total correct answers: {message['correct_count']}")
                 print(message["results"])
             case _:
                 print(message["text"])
