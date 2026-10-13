@@ -21,22 +21,25 @@ async def send_receive_messages(uri: str, client_id: str) -> None:
 
     Send and receive messages concurrently.
     """
-    #state  --vlastni mutable objekt, ktery bude parametrem funkci send i recieve, tak predam informaci o delce retezce
     state = {}
     async with connect(uri) as ws:
-        await asyncio.gather(send_messages(ws, client_id, state), receive_messages(ws, state))
+        await asyncio.gather(
+            send_messages(ws, client_id, state), receive_messages(ws, state)
+        )
 
 
-async def send_messages(ws: ClientConnection, client_id: str, state) -> None:
+async def send_messages(ws: ClientConnection, client_id: str, state: dict) -> None:
     """Prompt the user for input and send messages to the server over the websocket."""
     while True:
         user_input = await aioconsole.ainput()
-        user_input = sanitization(user_input)
-        if user_input:
+        user_input = sanitization(user_input, state)
+        if user_input != []:
             await ws.send(json.dumps({"client_id": client_id, "answer": user_input}))
+        else:
+            print("Invalid choice. Please choose again from given options.")
 
 
-async def receive_messages(ws: ClientConnection, state) -> None:
+async def receive_messages(ws: ClientConnection, state: dict) -> None:
     """Receive messages from the server and print them to the console."""
     while True:
         response = await ws.recv()
@@ -44,7 +47,7 @@ async def receive_messages(ws: ClientConnection, state) -> None:
 
         match message.get("type"):
             case "question":
-                state['length_of_question'] = len(message["options"])
+                state["length_of_question"] = len(message["options"])
                 print_question(message)
             case "repeat":
                 print(f"You answered: {message['text']}")
@@ -69,17 +72,21 @@ def print_question(question: dict[str, list]) -> None:
         print(f"\t{letter}) {opt}")
     print("Answer:")
 
-def sanitization(user_input: str) -> list[bool]:
+
+def sanitization(user_input: str, state: dict) -> list[bool]:
     """Provide list of bools instead of letters."""
     user_input = user_input.replace(" ", "")
     if user_input.isalpha():
-        position_of_max_letter = ord(max(user_input.upper())) - ord("A") + 1
-        answer = [False] * position_of_max_letter
+        answer = [False] * state["length_of_question"]
         for letter in user_input.upper():
             position_in_alphabet = ord(letter) - ord("A")
-            answer[position_in_alphabet] = True
+            if position_in_alphabet < len(answer):
+                answer[position_in_alphabet] = True
+            else:
+                return []
         return answer
     return []
+
 
 def main() -> None:
     """
