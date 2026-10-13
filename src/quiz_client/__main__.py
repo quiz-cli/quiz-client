@@ -21,11 +21,13 @@ async def send_receive_messages(uri: str, client_id: str) -> None:
 
     Send and receive messages concurrently.
     """
+    #state  --vlastni mutable objekt, ktery bude parametrem funkci send i recieve, tak predam informaci o delce retezce
+    state = {}
     async with connect(uri) as ws:
-        await asyncio.gather(send_messages(ws, client_id), receive_messages(ws))
+        await asyncio.gather(send_messages(ws, client_id, state), receive_messages(ws, state))
 
 
-async def send_messages(ws: ClientConnection, client_id: str) -> None:
+async def send_messages(ws: ClientConnection, client_id: str, state) -> None:
     """Prompt the user for input and send messages to the server over the websocket."""
     while True:
         user_input = await aioconsole.ainput()
@@ -34,7 +36,7 @@ async def send_messages(ws: ClientConnection, client_id: str) -> None:
             await ws.send(json.dumps({"client_id": client_id, "answer": user_input}))
 
 
-async def receive_messages(ws: ClientConnection) -> None:
+async def receive_messages(ws: ClientConnection, state) -> None:
     """Receive messages from the server and print them to the console."""
     while True:
         response = await ws.recv()
@@ -42,6 +44,7 @@ async def receive_messages(ws: ClientConnection) -> None:
 
         match message.get("type"):
             case "question":
+                state['length_of_question'] = len(message["options"])
                 print_question(message)
             case "repeat":
                 print(f"You answered: {message['text']}")
