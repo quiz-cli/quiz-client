@@ -29,14 +29,12 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
+[tool.ruff]
+extend = "../.github/ruff.toml"
+
 [tool.ruff.lint]
-select = ["ALL"]
 ignore = [
-    "D203",
-    "D212",
-    "COM812",
     "T201",
-    "CPY001",
 ]
 
 [tool.ruff.lint.per-file-ignores]
