@@ -58,6 +58,6 @@ def test_receive_messages_prints_question_result(
     websocket = FakeWebSocket(json.dumps(message))
 
     with pytest.raises(StopReceivingError):
-        asyncio.run(receive_messages(cast("ClientConnection", websocket)))
+        asyncio.run(receive_messages(cast("ClientConnection", websocket), state={}))
 
     assert capsys.readouterr().out == expected_output
